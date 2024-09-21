@@ -17,6 +17,8 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled,
+  phoneNo,
+  password,
 }) {
   function renderInputsByComponentType(getControlItem) {
     let element = null;
@@ -109,6 +111,9 @@ function CommonForm({
   }
 
   return (
+    <>
+    <h1>{phoneNo}</h1>
+    <h1>{password}</h1>
     <form onSubmit={onSubmit}>
       <div className="flex flex-col gap-3">
         {formControls.map((controlItem) => (
@@ -122,6 +127,7 @@ function CommonForm({
         {buttonText || "Submit"}
       </Button>
     </form>
+    </>
   );
 }
 

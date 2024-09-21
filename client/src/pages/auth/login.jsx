@@ -2,19 +2,42 @@ import CommonForm from "@/components/common/form";
 import { useToast } from "@/components/ui/use-toast";
 import { loginFormControls } from "@/config";
 import { loginUser } from "@/store/auth-slice";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const initialState = {
-  email: "",
+  phoneNo: "",
   password: "",
 };
+
+
+
 
 function AuthLogin() {
   const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
   const { toast } = useToast();
+  const location = useLocation();
+  const [phoneNo, setPhoneNo] = useState();
+  const [password, setPassword] = useState();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const phoneNo = searchParams.get('phoneNo');
+    setPhoneNo(phoneNo)
+    const password = searchParams.get('password');
+    setPassword(password)
+
+    console.log("Phone: " + phoneNo);
+    console.log("Password: " + password);
+  }, [location]);
+
+  // const {phoneNo, password} = req.query.params;
+  // console.log(phoneNo)
+  // console.log(password)
+  
 
   function onSubmit(event) {
     event.preventDefault();
@@ -55,6 +78,8 @@ function AuthLogin() {
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
+        phoneNo={phoneNo}
+        password={password}
       />
     </div>
   );

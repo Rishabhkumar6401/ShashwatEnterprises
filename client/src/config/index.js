@@ -1,3 +1,7 @@
+const validatePhoneNumber = (phoneNo) => {
+  const phoneRegex = /^[0-9]{10}$/;
+  return phoneRegex.test(phoneNo);
+};
 export const registerFormControls = [
   {
     name: "userName",
@@ -7,11 +11,20 @@ export const registerFormControls = [
     type: "text",
   },
   {
-    name: "email",
-    label: "Email",
-    placeholder: "Enter your email",
+    name: "userAddress",
+    label: "User Address",
+    placeholder: "Enter Address",
     componentType: "input",
-    type: "email",
+    type: "text",
+  },
+
+  {
+    name: "phoneNo",
+    label: "Phone no",
+    placeholder: "Enter phone no",
+    componentType: "input",
+    type: "Number",
+    validate: validatePhoneNumber,
   },
   {
     name: "password",
@@ -24,11 +37,12 @@ export const registerFormControls = [
 
 export const loginFormControls = [
   {
-    name: "email",
-    label: "Email",
-    placeholder: "Enter your email",
+    name: "phoneNo",
+    label: "phone no",
+    placeholder: "Enter phone no",
     componentType: "input",
-    type: "email",
+    type: "Number",
+    validate: validatePhoneNumber,
   },
   {
     name: "password",
