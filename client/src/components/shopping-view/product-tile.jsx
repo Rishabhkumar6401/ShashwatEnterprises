@@ -13,25 +13,25 @@ function ShoppingProductTile({
   handleUpdateQuantity
 }) {
   
-  const cartItem = cartItems.items.find(
-    (item) => item.productId === product._id
-  );
-  const productQuantity = cartItem ? cartItem.quantity : 0;
-  const [inputValue, setInputValue] = useState(productQuantity); // Assuming product.quantity holds the current quantity
+  // const cartItem = cartItems.items.find(
+  //   (item) => item.productId === product._id
+  // );
+  // const productQuantity = cartItem ? cartItem.quantity : 0;
+  // const [inputValue, setInputValue] = useState(productQuantity); // Assuming product.quantity holds the current quantity
 
-  const handleIncrement = () => {
-    const incValue = setInputValue(productQuantity+1)
+  // const handleIncrement = () => {
+  //   const incValue = setInputValue(productQuantity+1)
 
-    handleUpdateQuantity(product._id, productQuantity+1); // Call handleUpdate after incrementing
-  };
+  //   handleUpdateQuantity(product._id, productQuantity+1); // Call handleUpdate after incrementing
+  // };
 
-  const handleDecrement = () => {
-    const decValue = setInputValue(productQuantity-1)
+  // const handleDecrement = () => {
+  //   const decValue = setInputValue(productQuantity-1)
  
-      handleUpdateQuantity(product._id, productQuantity-1); // Decrement by 1
+  //     handleUpdateQuantity(product._id, productQuantity-1); // Decrement by 1
    
-     // Call handleUpdate after decrementing
-  };
+  //    // Call handleUpdate after decrementing
+  // };
 
 
   const handleAddToCartClick = () => {
@@ -96,30 +96,33 @@ function ShoppingProductTile({
           <Button className="w-full opacity-60 cursor-not-allowed">
             Out Of Stock
           </Button>
-        ) : productQuantity > 0 ? (
-          <div className="flex items-center gap-2 mt-1">
-            <Button
-            variant="outline"
-            className="h-8 w-8 rounded-full"
-            size="icon" onClick={handleDecrement} >
-              <Minus className="w-4 h-4" />
-            </Button>
-            <input
-               type="text"
-               value={inputValue}
-               onChange={handleInputChange} // Handle input change
-               onBlur={handleBlur} // Handle when input loses focustype="text"
+        ) : 
+        // productQuantity > 0 ? (
+        //   <div className="flex items-center gap-2 mt-1">
+        //     <Button
+        //     variant="outline"
+        //     className="h-8 w-8 rounded-full"
+        //     size="icon" onClick={handleDecrement} >
+        //       <Minus className="w-4 h-4" />
+        //     </Button>
+        //     <input
+        //        type="text"
+        //        value={inputValue}
+        //        onChange={handleInputChange} // Handle input change
+        //        onBlur={handleBlur} // Handle when input loses focustype="text"
               
               
-              className="w-1/3 text-center border"
-            />
-            <Button variant="outline"
-            className="h-8 w-8 rounded-full"
-            size="icon"onClick={handleIncrement} >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        ) : (
+        //       className="w-1/3 text-center border"
+        //     />
+        //     <Button variant="outline"
+        //     className="h-8 w-8 rounded-full"
+        //     size="icon"onClick={handleIncrement} >
+        //       <Plus className="w-4 h-4" />
+        //     </Button>
+        //   </div>
+        // ) 
+        // : 
+        (
           <Button
             onClick={handleAddToCartClick}
             className="w-full"

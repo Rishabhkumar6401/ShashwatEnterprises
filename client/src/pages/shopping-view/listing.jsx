@@ -122,84 +122,84 @@ function ShoppingListing() {
     });
   }
 
-  function handleUpdateQuantity(productId, value) {
-    let getCartItems = cartItems.items || [];
+  // function handleUpdateQuantity(productId, value) {
+  //   let getCartItems = cartItems.items || [];
     
-    // Find the product in the cart
-    const cartItem = getCartItems.find((item) => item.productId === productId);
+  //   // Find the product in the cart
+  //   const cartItem = getCartItems.find((item) => item.productId === productId);
   
-    if (!cartItem) {
-      toast({
-        title: "Product not found in the cart",
-        variant: "destructive",
-      });
-      return;
-    }
+  //   if (!cartItem) {
+  //     toast({
+  //       title: "Product not found in the cart",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
   
-    // Find the product details from the product list
-    const product = productList.find((item) => item._id === productId);
-    if (!product) {
-      toast({
-        title: "Product details not found",
-        variant: "destructive",
-      });
-      return;
-    }
+  //   // Find the product details from the product list
+  //   const product = productList.find((item) => item._id === productId);
+  //   if (!product) {
+  //     toast({
+  //       title: "Product details not found",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
   
-    const getTotalStock = product.totalStock;
-    const currentQuantity = cartItem.quantity;
-    let newQuantity = value
+  //   const getTotalStock = product.totalStock;
+  //   const currentQuantity = cartItem.quantity;
+  //   let newQuantity = value
   
-    // Validate the new quantity based on stock and ensure it does not go below 1
-    if (newQuantity > getTotalStock) {
-      toast({
-        title: `Only ${getTotalStock} items are available in stock`,
-        variant: "destructive",
-      });
-      return;
-    }
+  //   // Validate the new quantity based on stock and ensure it does not go below 1
+  //   if (newQuantity > getTotalStock) {
+  //     toast({
+  //       title: `Only ${getTotalStock} items are available in stock`,
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
   
-    if (newQuantity < 1) {
-      // Delete the item from the cart if quantity is less than 1
-      dispatch(
-        deleteCartItem({ userId: user?.id, productId: productId })
-      ).then((data) => {
-        if (data?.payload?.success) {
-          toast({
-            title: "Cart item deleted successfully",
-          });
-          dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
-        } else {
-          toast({
-            title: "Failed to delete cart item",
-            variant: "destructive",
-          });
-        }
-      });
-      return;
-    }
+  //   if (newQuantity < 1) {
+  //     // Delete the item from the cart if quantity is less than 1
+  //     dispatch(
+  //       deleteCartItem({ userId: user?.id, productId: productId })
+  //     ).then((data) => {
+  //       if (data?.payload?.success) {
+  //         toast({
+  //           title: "Cart item deleted successfully",
+  //         });
+  //         dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
+  //       } else {
+  //         toast({
+  //           title: "Failed to delete cart item",
+  //           variant: "destructive",
+  //         });
+  //       }
+  //     });
+  //     return;
+  //   }
   
-    // Dispatch the updated quantity to the cart
-    dispatch(
-      updateCartQuantity({
-        userId: user?.id,
-        productId: productId,
-        quantity: newQuantity,
-      })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        toast({
-          title: "Cart item updated successfully",
-        });
-        dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
-      } else {
-        toast({
-          title: "Failed to update cart item",
-          variant: "destructive",
-        });
-      }
-    });
-  }
+  //   // Dispatch the updated quantity to the cart
+  //   dispatch(
+  //     updateCartQuantity({
+  //       userId: user?.id,
+  //       productId: productId,
+  //       quantity: newQuantity,
+  //     })
+  //   ).then((data) => {
+  //     if (data?.payload?.success) {
+  //       toast({
+  //         title: "Cart item updated successfully",
+  //       });
+  //       dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
+  //     } else {
+  //       toast({
+  //         title: "Failed to update cart item",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   });
+  // }
   
   
 
@@ -230,6 +230,7 @@ function ShoppingListing() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
+      
       <ProductFilter filters={filters} handleFilter={handleFilter} />
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
@@ -271,8 +272,8 @@ function ShoppingListing() {
                   handleGetProductDetails={handleGetProductDetails}
                   product={productItem}
                   handleAddtoCart={handleAddtoCart}
-                  cartItems = {cartItems}
-                  handleUpdateQuantity = {handleUpdateQuantity}
+                  // cartItems = {cartItems} 
+                  // handleUpdateQuantity = {handleUpdateQuantity}
                 />
               ))
             : null}

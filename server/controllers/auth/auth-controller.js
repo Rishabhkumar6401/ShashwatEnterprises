@@ -4,22 +4,24 @@ const User = require("../../models/User");
 
 //register
 const registerUser = async (req, res) => {
-  const { userName, email, password } = req.body;
+  const { userName, userAddress, phoneNo, password } = req.body;
 
   try {
-    const checkUser = await User.findOne({ email });
+    const checkUser = await User.findOne({ phoneNo });
     if (checkUser)
       return res.json({
         success: false,
-        message: "User Already exists with the same email! Please try again",
+        message: "User Already exists with the same phone no! Please try again",
       });
 
     const hashPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
       userName,
-      email,
+      userAddress,
+      phoneNo,
       password: hashPassword,
     });
+   
 
     await newUser.save();
     res.status(200).json({
@@ -37,10 +39,10 @@ const registerUser = async (req, res) => {
 
 //login
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { phoneNo, password } = req.body;
 
   try {
-    const checkUser = await User.findOne({ email });
+    const checkUser = await User.findOne({ phoneNo });
     if (!checkUser)
       return res.json({
         success: false,
@@ -61,7 +63,7 @@ const loginUser = async (req, res) => {
       {
         id: checkUser._id,
         role: checkUser.role,
-        email: checkUser.email,
+        phoneNo: checkUser.phoneNo,
         userName: checkUser.userName,
       },
       "CLIENT_SECRET_KEY",
@@ -72,7 +74,7 @@ const loginUser = async (req, res) => {
       success: true,
       message: "Logged in successfully",
       user: {
-        email: checkUser.email,
+        phoneNo: checkUser.phoneNo,
         role: checkUser.role,
         id: checkUser._id,
         userName: checkUser.userName,
