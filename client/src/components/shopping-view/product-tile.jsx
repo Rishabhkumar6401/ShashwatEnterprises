@@ -42,17 +42,17 @@ function ShoppingProductTile({
   };
 
   const handleInputChange = (e) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0) {
-      setInputValue(value); // Update input field with valid number
+    const value = e.target.value; // Get the raw input value
+    if (value === '' || /^[0-9]*$/.test(value)) { // Allow empty or numeric input
+      setInputValue(value ? parseInt(value, 10) : ''); // Convert to number or reset to empty
     }
   };
 
   const handleBlur = () => {
     if (inputValue > 0) {
-      handleUpdateQuantity(product._id, inputValue); // Update quantity when input loses focus
+      handleUpdateQuantity(product._id, inputValue);
     } else {
-      setInputValue(productQuantity); // Reset to original quantity if input is invalid
+      setInputValue(productQuantity);
     }
   };
 
