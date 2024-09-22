@@ -76,7 +76,7 @@ function SearchProducts() {
     });
   }
 
-  function handleUpdateQuantity(productId, typeOfAction) {
+  function handleUpdateQuantity(productId, value) {
     let getCartItems = cartItems.items || [];
     
     // Find the product in the cart
@@ -102,7 +102,7 @@ function SearchProducts() {
   
     const getTotalStock = product.totalStock;
     const currentQuantity = cartItem.quantity;
-    let newQuantity = typeOfAction === "plus" ? currentQuantity + 1 : currentQuantity - 1;
+    let newQuantity = value
   
     // Validate the new quantity based on stock and ensure it does not go below 1
     if (newQuantity > getTotalStock) {

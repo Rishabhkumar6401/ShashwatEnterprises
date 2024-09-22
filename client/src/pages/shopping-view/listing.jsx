@@ -34,14 +34,14 @@ function createSearchParamsHelper(filterParams) {
     }
   }
 
-  console.log(queryParams, "queryParams");
+
 
   return queryParams.join("&");
 }
 
 function ShoppingListing() {
   const dispatch = useDispatch();
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, currentPage, hasMore, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -81,12 +81,12 @@ function ShoppingListing() {
   }
 
   function handleGetProductDetails(getCurrentProductId) {
-    console.log(getCurrentProductId);
+   
     dispatch(fetchProductDetails(getCurrentProductId));
   }
 
   function handleAddtoCart(getCurrentProductId, getTotalStock, newQuantity) {
-    console.log(cartItems);
+
     let getCartItems = cartItems.items || [];
 
     if (getCartItems.length) {
@@ -122,84 +122,84 @@ function ShoppingListing() {
     });
   }
 
-  // function handleUpdateQuantity(productId, value) {
-  //   let getCartItems = cartItems.items || [];
+  function handleUpdateQuantity(productId, value) {
+    let getCartItems = cartItems.items || [];
     
-  //   // Find the product in the cart
-  //   const cartItem = getCartItems.find((item) => item.productId === productId);
+    // Find the product in the cart
+    const cartItem = getCartItems.find((item) => item.productId === productId);
   
-  //   if (!cartItem) {
-  //     toast({
-  //       title: "Product not found in the cart",
-  //       variant: "destructive",
-  //     });
-  //     return;
-  //   }
+    if (!cartItem) {
+      toast({
+        title: "Product not found in the cart",
+        variant: "destructive",
+      });
+      return;
+    }
   
-  //   // Find the product details from the product list
-  //   const product = productList.find((item) => item._id === productId);
-  //   if (!product) {
-  //     toast({
-  //       title: "Product details not found",
-  //       variant: "destructive",
-  //     });
-  //     return;
-  //   }
+    // Find the product details from the product list
+    const product = productList.find((item) => item._id === productId);
+    if (!product) {
+      toast({
+        title: "Product details not found",
+        variant: "destructive",
+      });
+      return;
+    }
   
-  //   const getTotalStock = product.totalStock;
-  //   const currentQuantity = cartItem.quantity;
-  //   let newQuantity = value
+    const getTotalStock = product.totalStock;
+    const currentQuantity = cartItem.quantity;
+    let newQuantity = value
   
-  //   // Validate the new quantity based on stock and ensure it does not go below 1
-  //   if (newQuantity > getTotalStock) {
-  //     toast({
-  //       title: `Only ${getTotalStock} items are available in stock`,
-  //       variant: "destructive",
-  //     });
-  //     return;
-  //   }
+    // Validate the new quantity based on stock and ensure it does not go below 1
+    if (newQuantity > getTotalStock) {
+      toast({
+        title: `Only ${getTotalStock} items are available in stock`,
+        variant: "destructive",
+      });
+      return;
+    }
   
-  //   if (newQuantity < 1) {
-  //     // Delete the item from the cart if quantity is less than 1
-  //     dispatch(
-  //       deleteCartItem({ userId: user?.id, productId: productId })
-  //     ).then((data) => {
-  //       if (data?.payload?.success) {
-  //         toast({
-  //           title: "Cart item deleted successfully",
-  //         });
-  //         dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
-  //       } else {
-  //         toast({
-  //           title: "Failed to delete cart item",
-  //           variant: "destructive",
-  //         });
-  //       }
-  //     });
-  //     return;
-  //   }
+    if (newQuantity < 1) {
+      // Delete the item from the cart if quantity is less than 1
+      dispatch(
+        deleteCartItem({ userId: user?.id, productId: productId })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          toast({
+            title: "Cart item deleted successfully",
+          });
+          dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
+        } else {
+          toast({
+            title: "Failed to delete cart item",
+            variant: "destructive",
+          });
+        }
+      });
+      return;
+    }
   
-  //   // Dispatch the updated quantity to the cart
-  //   dispatch(
-  //     updateCartQuantity({
-  //       userId: user?.id,
-  //       productId: productId,
-  //       quantity: newQuantity,
-  //     })
-  //   ).then((data) => {
-  //     if (data?.payload?.success) {
-  //       toast({
-  //         title: "Cart item updated successfully",
-  //       });
-  //       dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
-  //     } else {
-  //       toast({
-  //         title: "Failed to update cart item",
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   });
-  // }
+    // Dispatch the updated quantity to the cart
+    dispatch(
+      updateCartQuantity({
+        userId: user?.id,
+        productId: productId,
+        quantity: newQuantity,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        toast({
+          title: "Cart item updated successfully",
+        });
+        dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
+      } else {
+        toast({
+          title: "Failed to update cart item",
+          variant: "destructive",
+        });
+      }
+    });
+  }
   
   
 
@@ -226,7 +226,24 @@ function ShoppingListing() {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
 
-  console.log(productList, "productListproductListproductList");
+
+
+  const fetchProducts = () => {
+    if (!hasMore) return;
+    
+    dispatch(fetchAllFilteredProducts({ filterParams: filters, sortParams: sort, page: currentPage }));
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || isLoading) return;
+
+      fetchProducts();
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isLoading, hasMore]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
@@ -266,18 +283,19 @@ function ShoppingListing() {
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4">
-          {productList && productList.length > 0
-            ? productList.map((productItem) => (
-                <ShoppingProductTile
-                  handleGetProductDetails={handleGetProductDetails}
-                  product={productItem}
-                  handleAddtoCart={handleAddtoCart}
-                  // cartItems = {cartItems} 
-                  // handleUpdateQuantity = {handleUpdateQuantity}
-                />
-              ))
-            : null}
-        </div>
+        {productList && productList.length > 0
+          ? productList.map((productItem) => (
+              <ShoppingProductTile
+                key={productItem._id}
+                handleGetProductDetails={handleGetProductDetails}
+                product={productItem}
+                handleAddtoCart={handleAddtoCart}
+                cartItems={cartItems} 
+                handleUpdateQuantity={handleUpdateQuantity}
+              />
+            ))
+          : null}
+      </div>
       </div>
       <ProductDetailsDialog
         open={openDetailsDialog}

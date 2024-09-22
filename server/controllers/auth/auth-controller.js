@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
+const Cart = require("../../models/Cart")
 
 //register
 const registerUser = async (req, res) => {
@@ -24,6 +25,14 @@ const registerUser = async (req, res) => {
    
 
     await newUser.save();
+
+    // Create a new cart for the user
+    const newCart = new Cart({
+      userId: newUser._id,
+      items: [], // Start with an empty cart
+    });
+    await newCart.save();
+
     res.status(200).json({
       success: true,
       message: "Registration successful",

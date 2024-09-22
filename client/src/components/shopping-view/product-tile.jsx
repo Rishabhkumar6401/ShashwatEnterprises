@@ -1,53 +1,56 @@
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
-import { brandOptionsMap, categoryOptionsMap } from "@/config";
+import { brandOptionsMap } from "@/config"; // removed categoryOptionsMap since it's not used
 import { Badge } from "../ui/badge";
-import { Minus, Plus, Trash } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddtoCart,
-  cartItems,
+  cartItems = { items: [] }, // Default cartItems to an empty object with items array to prevent errors
   handleUpdateQuantity
 }) {
-  
-  // const cartItem = cartItems.items.find(
-  //   (item) => item.productId === product._id
-  // );
-  // const productQuantity = cartItem ? cartItem.quantity : 0;
-  // const [inputValue, setInputValue] = useState(productQuantity); // Assuming product.quantity holds the current quantity
+  // Safely check cartItems and find if the product is already in the cart
+  const cartItem = cartItems?.items?.find(
+    (item) => item.productId === product._id
+  );
+  const productQuantity = cartItem ? cartItem.quantity : 0; // Get product quantity or default to 0
 
-  // const handleIncrement = () => {
-  //   const incValue = setInputValue(productQuantity+1)
+  const [inputValue, setInputValue] = useState(productQuantity); // Initialize quantity state
 
-  //   handleUpdateQuantity(product._id, productQuantity+1); // Call handleUpdate after incrementing
-  // };
+  const handleIncrement = () => {
+    const newQuantity = inputValue + 1;
+    setInputValue(newQuantity);
+    handleUpdateQuantity(product._id, newQuantity); // Update quantity after incrementing
+  };
 
-  // const handleDecrement = () => {
-  //   const decValue = setInputValue(productQuantity-1)
- 
-  //     handleUpdateQuantity(product._id, productQuantity-1); // Decrement by 1
-   
-  //    // Call handleUpdate after decrementing
-  // };
-
+  const handleDecrement = () => {
+    const newQuantity = inputValue > 1 ? inputValue - 1 : 0; // Prevent going below 0
+    setInputValue(newQuantity);
+    if (newQuantity === 0) {
+      handleUpdateQuantity(product._id, 0); // Optionally remove from cart if quantity is 0
+    } else {
+      handleUpdateQuantity(product._id, newQuantity);
+    }
+  };
 
   const handleAddToCartClick = () => {
-    handleAddtoCart(product._id, product.totalStock);
-   
+    handleAddtoCart(product._id, product.totalStock); // Add to cart
+    setInputValue(1); // Set initial quantity to 1 when added to cart
   };
- const handleInputChange = (e) => {
-    // Only set the local state for input value
-    setInputValue(e.target.value);
+
+  const handleInputChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0) {
+      setInputValue(value); // Update input field with valid number
+    }
   };
 
   const handleBlur = () => {
-    // Update productQuantity when the input field loses focus
-    const numericValue = parseInt(inputValue, 10);
-    if (!isNaN(numericValue) && numericValue >= 0) {
-      handleUpdateQuantity(product._id, numericValue); // Update quantity in the cart
+    if (inputValue > 0) {
+      handleUpdateQuantity(product._id, inputValue); // Update quantity when input loses focus
     } else {
       setInputValue(productQuantity); // Reset to original quantity if input is invalid
     }
@@ -77,18 +80,19 @@ function ShoppingProductTile({
           ) : null}
         </div>
         <CardContent className="px-3 py-2">
-          <h2 className="text-lg font-semibold mb-1 truncate">{product?.title}</h2>
+          <h2 className="text-lg font-semibold mb-1 truncate">
+            {product?.title}
+          </h2>
           <div className="flex justify-between items-center mb-1">
             <span className="text-sm text-muted-foreground">
-            {brandOptionsMap[product?.brand]}
+              {brandOptionsMap[product?.brand]}
             </span>
             <span className="text-sm text-muted-foreground">
-            <span className="text-md font-medium text-primary">
-            ₹{product?.salePrice}
+              <span className="text-md font-medium text-primary">
+                ₹{product?.salePrice}
               </span>
             </span>
           </div>
-          
         </CardContent>
       </div>
       <CardFooter>
@@ -96,37 +100,34 @@ function ShoppingProductTile({
           <Button className="w-full opacity-60 cursor-not-allowed">
             Out Of Stock
           </Button>
-        ) : 
-        // productQuantity > 0 ? (
-        //   <div className="flex items-center gap-2 mt-1">
-        //     <Button
-        //     variant="outline"
-        //     className="h-8 w-8 rounded-full"
-        //     size="icon" onClick={handleDecrement} >
-        //       <Minus className="w-4 h-4" />
-        //     </Button>
-        //     <input
-        //        type="text"
-        //        value={inputValue}
-        //        onChange={handleInputChange} // Handle input change
-        //        onBlur={handleBlur} // Handle when input loses focustype="text"
-              
-              
-        //       className="w-1/3 text-center border"
-        //     />
-        //     <Button variant="outline"
-        //     className="h-8 w-8 rounded-full"
-        //     size="icon"onClick={handleIncrement} >
-        //       <Plus className="w-4 h-4" />
-        //     </Button>
-        //   </div>
-        // ) 
-        // : 
-        (
-          <Button
-            onClick={handleAddToCartClick}
-            className="w-full"
-          >
+        ) : productQuantity > 0 ? (
+          <div className="flex items-center gap-2 mt-1">
+            <Button
+              variant="outline"
+              className="h-8 w-8 rounded-full"
+              size="icon"
+              onClick={handleDecrement}
+            >
+              <Minus className="w-4 h-4" />
+            </Button>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={handleInputChange} // Handle input change
+              onBlur={handleBlur} // Handle when input loses focus
+              className="w-1/3 text-center border"
+            />
+            <Button
+              variant="outline"
+              className="h-8 w-8 rounded-full"
+              size="icon"
+              onClick={handleIncrement}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        ) : (
+          <Button onClick={handleAddToCartClick} className="w-full">
             Add to cart
           </Button>
         )}
@@ -134,6 +135,5 @@ function ShoppingProductTile({
     </Card>
   );
 }
-
 
 export default ShoppingProductTile;
