@@ -41,7 +41,7 @@ function ShoppingProductTile({
     setInputValue(1); // Set initial quantity to 1 when added to cart
   };
 
-  const handleInputChange = (e) => {
+   const handleInputChange = (e) => {
     const value = e.target.value; // Get the raw input value
     if (value === '' || /^[0-9]*$/.test(value)) { // Allow empty or numeric input
       setInputValue(value ? parseInt(value, 10) : ''); // Convert to number or reset to empty
@@ -75,7 +75,7 @@ function ShoppingProductTile({
             </Badge>
           ) : product?.salePrice > 0 ? (
             <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
-              Sale
+              Coming Soon
             </Badge>
           ) : null}
         </div>
@@ -89,7 +89,7 @@ function ShoppingProductTile({
             </span>
             <span className="text-sm text-muted-foreground">
               <span className="text-md font-medium text-primary">
-                ₹{product?.salePrice}
+                ₹{product?.price}
               </span>
             </span>
           </div>

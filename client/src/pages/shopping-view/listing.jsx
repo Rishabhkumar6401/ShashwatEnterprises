@@ -3,7 +3,6 @@ import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
 import { Button } from "@/components/ui/button";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +21,7 @@ import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { resetProducts } from "@/store/shop/products-slice"; 
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -29,25 +29,22 @@ function createSearchParamsHelper(filterParams) {
   for (const [key, value] of Object.entries(filterParams)) {
     if (Array.isArray(value) && value.length > 0) {
       const paramValue = value.join(",");
-
       queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
-
-
 
   return queryParams.join("&");
 }
 
 function ShoppingListing() {
   const dispatch = useDispatch();
-  const { productList, productDetails, currentPage, hasMore, isLoading } = useSelector(
+  const { productList, productDetails, currentPage, hasMore, isLoading  } = useSelector(
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({});
-  const [sort, setSort] = useState(null);
+  const [sort, setSort] = useState("title-atoz");
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { toast } = useToast();
@@ -63,17 +60,14 @@ function ShoppingListing() {
     const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
 
     if (indexOfCurrentSection === -1) {
-      cpyFilters = {
-        ...cpyFilters,
-        [getSectionId]: [getCurrentOption],
-      };
+      cpyFilters[getSectionId] = [getCurrentOption];
     } else {
-      const indexOfCurrentOption =
-        cpyFilters[getSectionId].indexOf(getCurrentOption);
-
-      if (indexOfCurrentOption === -1)
+      const indexOfCurrentOption = cpyFilters[getSectionId].indexOf(getCurrentOption);
+      if (indexOfCurrentOption === -1) {
         cpyFilters[getSectionId].push(getCurrentOption);
-      else cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+      } else {
+        cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+      }
     }
 
     setFilters(cpyFilters);
@@ -81,12 +75,10 @@ function ShoppingListing() {
   }
 
   function handleGetProductDetails(getCurrentProductId) {
-   
     dispatch(fetchProductDetails(getCurrentProductId));
   }
 
-  function handleAddtoCart(getCurrentProductId, getTotalStock, newQuantity) {
-
+  function handleAddtoCart(getCurrentProductId, getTotalStock) {
     let getCartItems = cartItems.items || [];
 
     if (getCartItems.length) {
@@ -100,7 +92,6 @@ function ShoppingListing() {
             title: `Only ${getQuantity} quantity can be added for this item`,
             variant: "destructive",
           });
-
           return;
         }
       }
@@ -124,10 +115,8 @@ function ShoppingListing() {
 
   function handleUpdateQuantity(productId, value) {
     let getCartItems = cartItems.items || [];
-    
-    // Find the product in the cart
     const cartItem = getCartItems.find((item) => item.productId === productId);
-  
+
     if (!cartItem) {
       toast({
         title: "Product not found in the cart",
@@ -135,8 +124,7 @@ function ShoppingListing() {
       });
       return;
     }
-  
-    // Find the product details from the product list
+
     const product = productList.find((item) => item._id === productId);
     if (!product) {
       toast({
@@ -145,12 +133,10 @@ function ShoppingListing() {
       });
       return;
     }
-  
+
     const getTotalStock = product.totalStock;
-    const currentQuantity = cartItem.quantity;
-    let newQuantity = value
-  
-    // Validate the new quantity based on stock and ensure it does not go below 1
+    let newQuantity = value;
+
     if (newQuantity > getTotalStock) {
       toast({
         title: `Only ${getTotalStock} items are available in stock`,
@@ -158,17 +144,14 @@ function ShoppingListing() {
       });
       return;
     }
-  
+
     if (newQuantity < 1) {
-      // Delete the item from the cart if quantity is less than 1
-      dispatch(
-        deleteCartItem({ userId: user?.id, productId: productId })
-      ).then((data) => {
+      dispatch(deleteCartItem({ userId: user?.id, productId })).then((data) => {
         if (data?.payload?.success) {
           toast({
             title: "Cart item deleted successfully",
           });
-          dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
+          dispatch(fetchCartItems(user?.id));
         } else {
           toast({
             title: "Failed to delete cart item",
@@ -178,12 +161,11 @@ function ShoppingListing() {
       });
       return;
     }
-  
-    // Dispatch the updated quantity to the cart
+
     dispatch(
       updateCartQuantity({
         userId: user?.id,
-        productId: productId,
+        productId,
         quantity: newQuantity,
       })
     ).then((data) => {
@@ -191,7 +173,7 @@ function ShoppingListing() {
         toast({
           title: "Cart item updated successfully",
         });
-        dispatch(fetchCartItems(user?.id));  // Fetch updated cart items
+        dispatch(fetchCartItems(user?.id));
       } else {
         toast({
           title: "Failed to update cart item",
@@ -200,13 +182,11 @@ function ShoppingListing() {
       }
     });
   }
-  
-  
 
-  useEffect(() => {
-    setSort("price-lowtohigh");
-    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
-  }, [categorySearchParam]);
+  // useEffect(() => {
+  //   setSort("price-lowtohigh");
+  //   setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+  // }, [categorySearchParam]);
 
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
@@ -216,53 +196,46 @@ function ShoppingListing() {
   }, [filters]);
 
   useEffect(() => {
-    if (filters !== null && sort !== null)
-      dispatch(
-        fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
-      );
-  }, [dispatch, sort, filters]);
-
-  useEffect(() => {
-    if (productDetails !== null) setOpenDetailsDialog(true);
-  }, [productDetails]);
-
-
-
-  const fetchProducts = () => {
-    if (!hasMore) return;
+    // Reset products and current page when filters or sort change
+    dispatch(resetProducts());
     
+    // Fetch products with the new filters/sort
+    dispatch(fetchAllFilteredProducts({ filterParams: filters, sortParams: sort, page: 1 }));
+  }, [dispatch, filters, sort]);
+  
+  // Function to fetch more products when scrolling
+  const fetchProducts = () => {
+    if (!hasMore || isLoading) return;
+
     dispatch(fetchAllFilteredProducts({ filterParams: filters, sortParams: sort, page: currentPage }));
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || isLoading) return;
-
-      fetchProducts();
+      if (
+        window.innerHeight + document.documentElement.scrollTop +1 >=
+        document.documentElement.scrollHeight
+      ) {
+        fetchProducts();
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLoading, hasMore]);
+  }, [isLoading, hasMore, currentPage]);
+  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
-      
       <ProductFilter filters={filters} handleFilter={handleFilter} />
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-lg font-extrabold">All Products</h2>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">
-              {productList?.length} Products
-            </span>
+            <span className="text-muted-foreground">{productList?.length} Products</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                >
+                <Button variant="outline" size="sm" className="flex items-center gap-1">
                   <ArrowUpDownIcon className="h-4 w-4" />
                   <span>Sort by</span>
                 </Button>
@@ -270,10 +243,7 @@ function ShoppingListing() {
               <DropdownMenuContent align="end" className="w-[200px]">
                 <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem
-                      value={sortItem.id}
-                      key={sortItem.id}
-                    >
+                    <DropdownMenuRadioItem value={sortItem.id} key={sortItem.id}>
                       {sortItem.label}
                     </DropdownMenuRadioItem>
                   ))}
@@ -283,25 +253,31 @@ function ShoppingListing() {
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4">
-        {productList && productList.length > 0
-          ? productList.map((productItem) => (
+          {isLoading ? (
+            <p>Loading...</p> // Loading indicator
+          ) : productList.length > 0 ? (
+            productList.map((productItem) => (
               <ShoppingProductTile
                 key={productItem._id}
                 handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
                 handleAddtoCart={handleAddtoCart}
-                cartItems={cartItems} 
+                cartItems={cartItems}
                 handleUpdateQuantity={handleUpdateQuantity}
               />
             ))
-          : null}
+          ) : (
+            <p>No products found</p> // Empty state
+          )}
+        </div>
       </div>
-      </div>
-      <ProductDetailsDialog
-        open={openDetailsDialog}
-        setOpen={setOpenDetailsDialog}
-        productDetails={productDetails}
-      />
+      {openDetailsDialog && (
+        <ProductDetailsDialog
+          open={openDetailsDialog}
+          onClose={() => setOpenDetailsDialog(false)}
+          productDetails={productDetails}
+        />
+      )}
     </div>
   );
 }
