@@ -21,6 +21,20 @@ function AuthRegister() {
 
   function onSubmit(event) {
     event.preventDefault();
+    const validatePhoneNumber = (phoneNo) => {
+      const phoneRegex = /^[0-9]{10}$/;
+      return phoneRegex.test(phoneNo);
+    };
+    
+    
+    if (!validatePhoneNumber(formData.phoneNo)) {
+      toast({
+        title: "Invalid phone number. It must be 10 digits without country code.",
+        variant: "destructive",
+      });
+      return; // Prevent form submission
+    }
+  
     dispatch(registerUser(formData)).then((data) => {
       if (data?.payload?.success) {
         toast({
@@ -35,17 +49,17 @@ function AuthRegister() {
       }
     });
   }
-
+  
   console.log(formData);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Create new account
+          Create new Shop Account
         </h1>
         <p className="mt-2">
-          Already have an account
+          Already have an Shop Account
           <Link
             className="font-medium ml-2 text-primary hover:underline"
             to="/auth/login"

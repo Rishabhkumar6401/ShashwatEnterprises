@@ -21,10 +21,10 @@ export const registerFormControls = [
   {
     name: "phoneNo",
     label: "Phone no",
-    placeholder: "Enter phone no",
+    placeholder: "Enter Phone Number",
     componentType: "input",
     type: "Number",
-    validate: validatePhoneNumber,
+    pattern:"[0-9]{10}"
   },
   {
     name: "password",
@@ -39,10 +39,10 @@ export const loginFormControls = [
   {
     name: "phoneNo",
     label: "phone no",
-    placeholder: "Enter phone no",
+    placeholder: "Enter Phone Number",
     componentType: "input",
     type: "Number",
-    validate: validatePhoneNumber,
+    pattern:"[0-9]{10}"
   },
   {
     name: "password",
@@ -99,13 +99,13 @@ export const addProductFormElements = [
     type: "number",
     placeholder: "Enter product price",
   },
-  {
-    label: "Sale Price",
-    name: "salePrice",
-    componentType: "input",
-    type: "number",
-    placeholder: "Enter sale price (optional)",
-  },
+  // {
+  //   label: "Sale Price",
+  //   name: "salePrice",
+  //   componentType: "input",
+  //   type: "number",
+  //   placeholder: "Enter sale price (optional)",
+  // },
   {
     label: "Total Stock",
     name: "totalStock",

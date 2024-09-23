@@ -26,12 +26,12 @@ const initialFormData = {
   category: "",
   brand: "",
   price: "",
-  salePrice: 0,
+  salePrice: "",
   totalStock: "",
   averageReview: 0,
 };
 
-function AdminProducts() {
+function AdminComingSoon() {
   const [openCreateProductsDialog, setOpenCreateProductsDialog] =
     useState(false);
   const [formData, setFormData] = useState(initialFormData);
@@ -43,6 +43,9 @@ function AdminProducts() {
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
+
+  // Filter products with salePrice greater than 1
+  const filteredProductList = productList.filter(product => product.salePrice > 1);
 
   function onSubmit(event) {
     event.preventDefault();
@@ -93,18 +96,34 @@ function AdminProducts() {
       .map((key) => formData[key] !== "")
       .every((item) => item);
   }
+
   function markInStock(productId) {
     console.log("Marking product as in stock:", productId); // Debug log
     dispatch(editProduct({ id: productId, formData: { salePrice: 0 } }))
       .then((data) => {
         if (data?.payload?.success) {
-          dispatch(fetchAllProducts());
+          dispatch(fetchAllProducts()); // Fetch updated product list
           toast({
             title: "Product marked as in stock",
           });
+        } else {
+          toast({
+            title: "Failed to mark product as in stock",
+            description: data?.payload?.message || "Something went wrong.",
+            variant: "destructive",
+          });
         }
+      })
+      .catch((error) => {
+        console.error("Error marking product as in stock:", error);
+        toast({
+          title: "Error",
+          description: "Failed to mark product as in stock.",
+          variant: "destructive",
+        });
       });
   }
+
   const markOutOfStock = (productId) => {
     dispatch(editProduct({ id: productId, formData: { salePrice: 10 } }))
       .then((data) => {
@@ -131,7 +150,8 @@ function AdminProducts() {
       });
   };
   
-
+  
+  
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
@@ -139,25 +159,27 @@ function AdminProducts() {
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
-        <Button onClick={() => setOpenCreateProductsDialog(true)} size="sm">
+        <Button onClick={() => setOpenCreateProductsDialog(true)}>
           Add New Product
         </Button>
       </div>
       <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        {productList && productList.length > 0
-          ? productList.map((productItem) => (
-              <AdminProductTile
-                key={productItem._id}
-                setFormData={setFormData}
-                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-                setCurrentEditedId={setCurrentEditedId}
-                product={productItem}
-                handleDelete={handleDelete}
-                markInStock={markInStock} // Pass the function
-                markOutOfStock ={markOutOfStock }
-              />
-            ))
-          : null}
+        {filteredProductList.length > 0 ? (
+          filteredProductList.map((productItem) => (
+            <AdminProductTile
+              key={productItem._id}
+              setFormData={setFormData}
+              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+              setCurrentEditedId={setCurrentEditedId}
+              product={productItem}
+              handleDelete={handleDelete}
+              markInStock={markInStock} // Pass the function
+              markOutOfStock = {markOutOfStock }
+            />
+          ))
+        ) : (
+          <p>No product is Out Of Stock!</p>
+        )}
       </div>
       <Sheet
         open={openCreateProductsDialog}
@@ -198,4 +220,4 @@ function AdminProducts() {
   );
 }
 
-export default AdminProducts;
+export default AdminComingSoon;

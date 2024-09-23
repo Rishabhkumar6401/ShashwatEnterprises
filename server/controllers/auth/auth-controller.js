@@ -15,12 +15,12 @@ const registerUser = async (req, res) => {
         message: "User Already exists with the same phone no! Please try again",
       });
 
-    const hashPassword = await bcrypt.hash(password, 12);
+    // const hashPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
       userName,
       userAddress,
       phoneNo,
-      password: hashPassword,
+      password: password,
     });
    
 
@@ -58,10 +58,8 @@ const loginUser = async (req, res) => {
         message: "User doesn't exists! Please register first",
       });
 
-    const checkPasswordMatch = await bcrypt.compare(
-      password,
-      checkUser.password
-    );
+      const checkPasswordMatch = password === checkUser.password;
+
     if (!checkPasswordMatch)
       return res.json({
         success: false,

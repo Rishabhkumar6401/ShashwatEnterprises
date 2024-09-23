@@ -26,13 +26,13 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       </SheetHeader>
       <div className="mt-8 space-y-4">
         {cartItems && cartItems.length > 0
-          ? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
+          ? cartItems.map((item) => <UserCartItemsContent key={item.id} cartItem={item} />)
           : null}
       </div>
       <div className="mt-8 space-y-4">
         <div className="flex justify-between">
           <span className="font-bold">Total</span>
-          <span className="font-bold">${totalCartAmount}</span>
+          <span className="font-bold">₹{totalCartAmount}</span>
         </div>
       </div>
       <Button
@@ -41,6 +41,7 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
           setOpenCartSheet(false);
         }}
         className="w-full mt-6"
+        disabled={cartItems.length === 0} // Disable button if cart is empty
       >
         Checkout
       </Button>

@@ -2,21 +2,23 @@ import { Button } from "@/components/ui/button";
 import bannerOne from "../../assets/banner-1.webp";
 import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
+import { GiChocolateBar } from "react-icons/gi";
 import {
-  Airplay,
-  BabyIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CloudLightning,
-  Heater,
-  Images,
-  Shirt,
-  ShirtIcon,
-  ShoppingBasket,
-  UmbrellaIcon,
-  WashingMachine,
-  WatchIcon,
+  CupSoda,
+  Lollipop ,
+  Torus,
+  Salad
 } from "lucide-react";
+import Shadani from "../../assets/shadani1.png"; // Corrected import
+import Zubi from "../../assets/zubib1.webp"; // Corrected import
+import Vpure from "../../assets/vpure.png"; // Corrected import
+import Roasty from "../../assets/rosty.png"; // Corrected import
+import Skippi from "../../assets/skippi.png"; // Corrected import
+import Sunbeam from "../../assets/sunbeams.png"; // Corrected import
+import Imported from "../../assets/imported.png"; // Corrected import
+import Gourmet from "../../assets/gourmet.png"; // Corrected import
+import  FavFood from "../../assets/fav.png"; // Corrected import
+import  Chocozay from "../../assets/chocozys.png"; // Corrected import
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,20 +35,20 @@ import { getFeatureImages } from "@/store/common-slice";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
 
 const categoriesWithIcon = [
-  { id: "Drinks", label: "Drinks", icon: ShirtIcon },
-  { id: "Candy", label: "Candy", icon: CloudLightning },
-  { id: "Chips", label: "Chips", icon: BabyIcon },
-  { id: "Choclates", label: "Choclates", icon: WatchIcon },
-  { id: "Namkeen", label: "Namkeen", icon: UmbrellaIcon },
+  { id: "Drinks", label: "Drinks", icon: CupSoda },
+  { id: "Candy", label: "Candy", icon: Lollipop },
+  { id: "Chips", label: "Chips", icon: Torus },
+  { id: "Choclates", label: "Choclates", icon: GiChocolateBar  },
+  { id: "Namkeen", label: "Namkeen", icon: Salad },
 ];
 
 const brandsWithIcon = [
-  { id: "Shadani", label: "Shadani", icon: Shirt },
-  { id: "Zubi", label: "Zubi", icon: WashingMachine },
-  { id: "Vpure", label: "Vpure", icon: ShoppingBasket },
-  { id: "Chocozay", label: "Chocozay", icon: Airplay },
-  { id: "SunBeam", label: "SunBeam", icon: Images },
-  { id: "Skippi", label: "Skippi", icon: Heater },
+  { id: "Shadani", label: "Shadani", icon: Shadani },
+  { id: "Zubi", label: "Zubi", icon: Zubi },
+  { id: "Vpure", label: "Vpure", icon: Vpure },
+  { id: "Chocozay", label: "Chocozay", icon: Chocozay },
+  { id: "SunBeam", label: "SunBeam", icon: Sunbeam },
+  { id: "Skippi", label: "Skippi", icon: Skippi },
 ];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -221,6 +223,7 @@ function ShoppingHome() {
   useEffect(() => {
     dispatch(getFeatureImages());
   }, [dispatch]);
+  
 
   return (
     
@@ -252,6 +255,27 @@ function ShoppingHome() {
   </div>
 </div>
 
+<section className="py-12 bg-gray-50">
+  <div className="container mx-auto px-4">
+    <h2 className="text-3xl font-bold text-center mb-8">Shop by Brand</h2>
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {brandsWithIcon.map((brandItem) => (
+        <Card
+          key={brandItem.id} // Add a key prop for each item
+          onClick={() => handleNavigateToListingPage(brandItem, "brand")}
+          className="cursor-pointer hover:shadow-lg transition-shadow"
+        >
+          <CardContent className="flex flex-col items-center justify-center p-6">
+            <img src={brandItem.icon} alt={brandItem.label} className="w-18 h-16 " />
+            <span className="font-bold">{brandItem.label}</span>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
+
+
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">
@@ -275,24 +299,7 @@ function ShoppingHome() {
         </div>
       </section>
 
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Shop by Brand</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {brandsWithIcon.map((brandItem) => (
-              <Card
-                onClick={() => handleNavigateToListingPage(brandItem, "brand")}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-              >
-                <CardContent className="flex flex-col items-center justify-center p-6">
-                  <brandItem.icon className="w-12 h-12 mb-4 text-primary" />
-                  <span className="font-bold">{brandItem.label}</span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       <section className="py-12">
         <div className="container mx-auto px-4">

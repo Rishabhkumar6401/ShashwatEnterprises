@@ -37,6 +37,8 @@ export const fetchAllProducts = createAsyncThunk(
 export const editProduct = createAsyncThunk(
   "/products/editProduct",
   async ({ id, formData }) => {
+    console.log(id)
+    console.log(formData)
     const result = await axios.put(
       `http://localhost:5000/api/admin/products/edit/${id}`,
       formData,
@@ -62,6 +64,8 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
+
+
 const AdminProductsSlice = createSlice({
   name: "adminProducts",
   initialState,
@@ -78,7 +82,18 @@ const AdminProductsSlice = createSlice({
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.productList = [];
+      })
+      .addCase(editProduct.fulfilled, (state, action) => {
+        // Handle the fulfilled state, updating the product list
+        const updatedProducts = state.productList.map(product =>
+          product._id === action.payload.data._id ? action.payload.data : product
+        );
+        state.productList = updatedProducts;
+      })
+      .addCase(editProduct.rejected, (state, action) => {
+        state.error = action.error.message;
       });
+      
   },
 });
 

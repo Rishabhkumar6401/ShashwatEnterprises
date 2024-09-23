@@ -104,16 +104,16 @@ const editProduct = async (req, res) => {
         message: "Product not found",
       });
 
-    findProduct.title = title || findProduct.title;
-    findProduct.description = description || findProduct.description;
-    findProduct.category = category || findProduct.category;
-    findProduct.brand = brand || findProduct.brand;
-    findProduct.price = price === "" ? 0 : price || findProduct.price;
-    findProduct.salePrice =
-      salePrice === "" ? 0 : salePrice || findProduct.salePrice;
-    findProduct.totalStock = totalStock || findProduct.totalStock;
-    findProduct.image = image || findProduct.image;
-    findProduct.averageReview = averageReview || findProduct.averageReview;
+    // Update fields only if they are provided in the request body
+    if (title !== undefined) findProduct.title = title;
+    if (description !== undefined) findProduct.description = description;
+    if (category !== undefined) findProduct.category = category;
+    if (brand !== undefined) findProduct.brand = brand;
+    if (price !== undefined) findProduct.price = price === "" ? 0 : price;
+    if (salePrice !== undefined) findProduct.salePrice = salePrice === "" ? 0 : salePrice;
+    if (totalStock !== undefined) findProduct.totalStock = totalStock;
+    if (image !== undefined) findProduct.image = image;
+    if (averageReview !== undefined) findProduct.averageReview = averageReview;
 
     await findProduct.save();
     res.status(200).json({
@@ -124,10 +124,11 @@ const editProduct = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Error occurred",
     });
   }
 };
+
 
 //delete a product
 const deleteProduct = async (req, res) => {

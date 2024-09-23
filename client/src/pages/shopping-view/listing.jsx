@@ -183,10 +183,10 @@ function ShoppingListing() {
     });
   }
 
-  // useEffect(() => {
-  //   setSort("price-lowtohigh");
-  //   setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
-  // }, [categorySearchParam]);
+  useEffect(() => {
+    setSort("price-lowtohigh");
+    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+  }, [categorySearchParam]);
 
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {

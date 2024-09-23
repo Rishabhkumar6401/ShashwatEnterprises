@@ -21,16 +21,16 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
-            <Label>${orderDetails?.totalAmount}</Label>
+            <Label>₹{orderDetails?.totalAmount}</Label>
           </div>
-          <div className="flex mt-2 items-center justify-between">
+          {/* <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Payment method</p>
             <Label>{orderDetails?.paymentMethod}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Payment Status</p>
             <Label>{orderDetails?.paymentStatus}</Label>
-          </div>
+          </div> */}
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Status</p>
             <Label>

@@ -22,6 +22,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 // import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
+import AdminBrands from "./pages/admin-view/brands";
+import AdminCategory from "./pages/admin-view/categories";
+import AdminComingSoon from "./pages/admin-view/comingSoon";
+import { OrderSuccessPage } from "./pages/shopping-view/OrderSuccessPage";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -71,6 +75,9 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="brands" element={<AdminBrands />} />
+          <Route path="categories" element={<AdminCategory />} />
+          <Route path="coming-soon" element={<AdminComingSoon />} />
           <Route path="features" element={<AdminFeatures />} />
         </Route>
         <Route
@@ -84,6 +91,7 @@ function App() {
           <Route path="home" element={<ShoppingHome />} />
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="checkout" element={<ShoppingCheckout />} />
+          <Route path="orderSuccess" element={<OrderSuccessPage/>} />
           <Route path="account" element={<ShoppingAccount />} />
           {/* <Route path="paypal-return" element={<PaypalReturnPage />} /> */}
           <Route path="payment-success" element={<PaymentSuccessPage />} />
