@@ -127,31 +127,6 @@ export const shoppingViewHeaderMenuItems = [
     path: "/shop/listing",
   },
   {
-    id: "Drinks",
-    label: "Drinks",
-    path: "/shop/listing",
-  },
-  {
-    id: "Candy",
-    label: "Candy",
-    path: "/shop/listing",
-  },
-  {
-    id: "Chips",
-    label: "Chips",
-    path: "/shop/listing",
-  },
-  {
-    id: "Choclates",
-    label: "Choclates",
-    path: "/shop/listing",
-  },
-  {
-    id: "Namkeen",
-    label: "Namkeen",
-    path: "/shop/listing",
-  },
-  {
     id: "search",
     label: "Search",
     path: "/shop/search",
@@ -185,7 +160,7 @@ export const filterOptions = {
   ],
   brand: [
     { id: "Shadani", label: "Shadani" },
-    { id: "SubBeam", label: "SunBeam" },
+    { id: "SunBeam", label: "SunBeam" },
     { id: "Zubi", label: "Zubi" },
     { id: "Skippi", label: "Skippi" },
     { id: "Vpure", label: "Vpure" },

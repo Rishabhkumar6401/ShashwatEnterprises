@@ -6,7 +6,7 @@ const initialState = {
   productList: [],
   productDetails: null,
   currentPage: 1,
-  hasMore: true,
+  hasMore: true, // Determines whether more products can be loaded
 };
 
 export const fetchAllFilteredProducts = createAsyncThunk(
@@ -26,6 +26,19 @@ export const fetchAllFilteredProducts = createAsyncThunk(
   }
 );
 
+// Fetch the latest 12 products sorted by creation date
+export const fetchLatestProducts = createAsyncThunk(
+  "/products/fetchLatestProducts",
+  async () => {
+    // Fetch latest products and limit the result to 12
+    const result = await axios.get(
+      `http://localhost:5000/api/shop/products/get?limit=12&sortBy=createdAt:desc`
+    );
+
+    return result?.data;
+  }
+);
+
 export const fetchProductDetails = createAsyncThunk(
   "/products/fetchProductDetails",
   async (id) => {
@@ -37,6 +50,8 @@ export const fetchProductDetails = createAsyncThunk(
   }
 );
 
+
+
 const shoppingProductSlice = createSlice({
   name: "shoppingProducts",
   initialState,
@@ -46,21 +61,43 @@ const shoppingProductSlice = createSlice({
     },
     resetProducts: (state) => {
       state.productList = [];
-      state.currentPage = 1;
+      // state.currentPage = 1;
       state.hasMore = true;
     },
+    resetPaginations: (state) => {
+      state.currentPage = 1;
+      state.hasMore = true;
+
+    },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload; // Set current page from payload
+    },
+    
   },
   extraReducers: (builder) => {
     builder
+    .addCase(fetchLatestProducts.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(fetchLatestProducts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.productList = action.payload.data; // Store the latest 12 products
+    })
+    .addCase(fetchLatestProducts.rejected, (state) => {
+      state.isLoading = false;
+      state.productList = [];
+    })
       .addCase(fetchAllFilteredProducts.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(fetchAllFilteredProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Append new products
-        if (action.payload.data.length > 0) {
-          state.productList = [...state.productList, ...action.payload.data];
-          state.currentPage += 1; // Increment current page
+        const products = action.payload.data;
+
+        // If no more products are returned, stop further requests
+        if (products.length > 0) {
+          state.productList = [...state.productList, ...products];
+          // state.currentPage += 1; // Increment current page
         } else {
           state.hasMore = false; // No more products to load
         }
@@ -83,6 +120,6 @@ const shoppingProductSlice = createSlice({
   },
 });
 
-export const { setProductDetails, resetProducts } = shoppingProductSlice.actions;
+export const { setProductDetails, resetProducts, resetPaginations,  setCurrentPage } = shoppingProductSlice.actions;
 
 export default shoppingProductSlice.reducer;

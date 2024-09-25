@@ -23,7 +23,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchAllFilteredProducts,
+  fetchLatestProducts,
   fetchProductDetails,
 } from "@/store/shop/products-slice";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
@@ -210,12 +210,7 @@ function ShoppingHome() {
   }, [featureImageList]);
 
   useEffect(() => {
-    dispatch(
-      fetchAllFilteredProducts({
-        filterParams: {},
-        sortParams: "price-lowtohigh",
-      })
-    );
+    dispatch(fetchLatestProducts());
   }, [dispatch]);
 
 
@@ -227,7 +222,7 @@ function ShoppingHome() {
 
   return (
     
-    <div className="flex flex-col min-h-screen p-3">
+    <div className="flex flex-col min-h-screen p-3 mt-16">
      <div className="relative w-full h-[190px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden ">
   {featureImageList && featureImageList.length > 0
     ? featureImageList.map((slide, index) => (

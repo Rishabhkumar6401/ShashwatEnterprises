@@ -21,7 +21,7 @@ import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { resetProducts } from "@/store/shop/products-slice"; 
+import { resetProducts, setCurrentPage,resetPaginations } from "@/store/shop/products-slice";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -38,24 +38,29 @@ function createSearchParamsHelper(filterParams) {
 
 function ShoppingListing() {
   const dispatch = useDispatch();
-  const { productList, productDetails, currentPage, hasMore, isLoading  } = useSelector(
+  const { productList, productDetails, currentPage, hasMore, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({});
-  const [sort, setSort] = useState("title-atoz");
+  const [sort, setSort] = useState("price-hightolow");
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const { toast } = useToast();
 
   const categorySearchParam = searchParams.get("category");
 
-  function handleSort(value) {
-    setSort(value);
-  }
+  // function handleSort(value) {
+  //   setSort(value);
+  // }
+  const clearFilters = () => {
+    setFilters({}); // Reset filters to their initial state
+  };
 
   function handleFilter(getSectionId, getCurrentOption) {
+    setShowFilters(false)
     let cpyFilters = { ...filters };
     const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
 
@@ -183,68 +188,107 @@ function ShoppingListing() {
     });
   }
 
+   // Function to fetch products, only if not loading and has more products
+   const fetchProducts = () => {
+    if (!isLoading && hasMore) {
+      dispatch(
+        fetchAllFilteredProducts({
+          filterParams: filters,
+          sortParams: sort,
+          page: currentPage,
+        })
+      );
+    }
+  };
   useEffect(() => {
-    setSort("price-lowtohigh");
+    // setSort("price-lowtohigh");
     setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
   }, [categorySearchParam]);
-
+  // Fetch products when filters or sorting changes
   useEffect(() => {
+    dispatch(resetProducts()); // Reset products when the filters or sorting change
+    // dispatch(resetPaginations())
+    fetchProducts();
+  }, [filters, sort]);
+
+ 
+
+  // Handle sort change
+  const handleSort = (newSort) => {
+    setSort(newSort); // Update sort state, which will trigger useEffect to fetch products
+  };
+
+    useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
       const createQueryString = createSearchParamsHelper(filters);
+      dispatch(resetPaginations())
       setSearchParams(new URLSearchParams(createQueryString));
+
     }
   }, [filters]);
 
-  useEffect(() => {
-    // Reset products and current page when filters or sort change
-    dispatch(resetProducts());
-    
-    // Fetch products with the new filters/sort
-    dispatch(fetchAllFilteredProducts({ filterParams: filters, sortParams: sort, page: 1 }));
-  }, [dispatch, filters, sort]);
-  
-  // Function to fetch more products when scrolling
-  const fetchProducts = () => {
-    if (!hasMore || isLoading) return;
-
-    dispatch(fetchAllFilteredProducts({ filterParams: filters, sortParams: sort, page: currentPage }));
+  // Handle infinite scroll for fetching more products
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop + 100 >=
+        document.documentElement.scrollHeight &&
+      hasMore &&
+      !isLoading
+    ) {
+      dispatch(setCurrentPage(currentPage + 1))
+      fetchProducts(); // Fetch more products if at the bottom of the page and if there are more
+    }
   };
 
+  // Attach scroll event listener for infinite scroll
   useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop +1 >=
-        document.documentElement.scrollHeight
-      ) {
-        fetchProducts();
-      }
-    };
-
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLoading, hasMore, currentPage]);
+    return () => window.removeEventListener("scroll", handleScroll); // Clean up on component unmount
+  }, [hasMore, isLoading]);
+
   
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
+    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6 mt-16">
+    {/* Toggle button for filters, visible only on mobile and tablet */}
+    <button 
+      className="p-2 bg-gray-200 rounded-md mb-4 md:hidden" // Hide on md and larger
+      onClick={() => setShowFilters(prev => !prev)} // Toggle filter visibility
+    >
+      {showFilters ? "Hide Filters" : "Show Filters"}
+    </button>
+
+    {/* Filter component, shown only on mobile and tablet */}
+    <div className={`transition-all duration-300 ease-in-out ${showFilters ? "block" : "hidden"} md:block`}>
       <ProductFilter filters={filters} handleFilter={handleFilter} />
+      {/* Clear Filters button, shown after filters */}
+      <button 
+        className="mt-2 p-2 bg-red-500 text-white rounded-md"
+        onClick={clearFilters}
+      >
+        Clear Filters
+      </button>
+    </div>
+
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-lg font-extrabold">All Products</h2>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">{productList?.length} Products</span>
+            <span className="text-muted-foreground">{productList?.length} results</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center gap-1">
-                  <ArrowUpDownIcon className="h-4 w-4" />
-                  <span>Sort by</span>
+                <Button variant="outline" className="ml-auto">
+                  Sort <ArrowUpDownIcon className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
-                  {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem value={sortItem.id} key={sortItem.id}>
-                      {sortItem.label}
+              <DropdownMenuContent>
+                <DropdownMenuRadioGroup
+                  value={sort}
+                  onValueChange={handleSort}
+                >
+                  {sortOptions.map((option, index) => (
+                    <DropdownMenuRadioItem key={index} value={option.value}>
+                      {option.label}
                     </DropdownMenuRadioItem>
                   ))}
                 </DropdownMenuRadioGroup>
@@ -252,32 +296,28 @@ function ShoppingListing() {
             </DropdownMenu>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4">
-          {isLoading ? (
-            <p>Loading...</p> // Loading indicator
-          ) : productList.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4">
+          {productList?.length > 0 ? (
             productList.map((productItem) => (
               <ShoppingProductTile
                 key={productItem._id}
-                handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
+                handleGetProductDetails={handleGetProductDetails}
                 handleAddtoCart={handleAddtoCart}
                 cartItems={cartItems}
                 handleUpdateQuantity={handleUpdateQuantity}
               />
             ))
           ) : (
-            <p>No products found</p> // Empty state
+            <p>No products found.</p>
           )}
         </div>
       </div>
-      {openDetailsDialog && (
-        <ProductDetailsDialog
-          open={openDetailsDialog}
-          onClose={() => setOpenDetailsDialog(false)}
-          productDetails={productDetails}
-        />
-      )}
+      <ProductDetailsDialog
+        open={openDetailsDialog}
+        setOpen={setOpenDetailsDialog}
+        product={productDetails}
+      />
     </div>
   );
 }
