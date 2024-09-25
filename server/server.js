@@ -24,11 +24,11 @@ mongoose
   .catch((error) => console.log(error));
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 app.use(
   cors({
-    origin: "https://shashwat-enterprises.vercel.app/",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
